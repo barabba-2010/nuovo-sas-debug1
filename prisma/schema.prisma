@@ -1,0 +1,161 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  // Fallback per debug locale: decommentare la riga sotto e commentare le due sopra se necessario
+  // provider = "sqlite"
+  // url      = "file:./dev.db"
+}
+
+model User {
+  id            String       @id @default(cuid())
+  name          String?
+  email         String       @unique
+  emailVerified DateTime?
+  password      String
+  image         String?
+  role          Role         @default(EMPLOYEE)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  accounts      Account[]
+  sessions      Session[]
+  test_results  TestResult[]
+  reports       Report[]
+  created_tests Test[]       @relation("UserCreatedTests")
+  
+  // Multi-tenancy relations
+  organizationMemberships UserOrganization[]
+  managedTeams           Team[]              @relation("TeamManager")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Test {
+  id           String       @id @default(cuid())
+  title        String
+  description  String
+  instructions String
+  category     String
+  type         TestType
+  questions    String // JSON stored as string in SQLite
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  creatorId    String // User ID of the creator
+  isActive     Boolean      @default(true)
+  timeLimit    Int          @default(0) // Time limit in minutes, 0 means no limit
+  scoring      String? // JSON scoring rules stored as string
+  metadata     String? // Additional metadata stored as JSON
+  creator      User         @relation("UserCreatedTests", fields: [creatorId], references: [id], onDelete: Cascade)
+  test_results TestResult[]
+}
+
+model TestResult {
+  id          String   @id @default(cuid())
+  userId      String
+  testId      String
+  answers     String // JSON stored as string in SQLite
+  metadata    String? // JSON stored as string in SQLite
+  completedAt DateTime @default(now())
+  createdAt   DateTime @default(now()) // <--- aggiunta questa riga
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  test        Test     @relation(fields: [testId], references: [id], onDelete: Cascade)
+  reports     Report[]
+}
+
+model Report {
+  id           String      @id @default(cuid())
+  userId       String
+  testResultId String?
+  title        String
+  content      String // Large text in SQLite
+  metadata     String? // JSON stored as string in SQLite
+  createdAt    DateTime    @default(now())
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  testResult   TestResult? @relation(fields: [testResultId], references: [id], onDelete: Cascade)
+}
+
+model Organization {
+  id        String   @id @default(cuid())
+  name      String
+  code      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  teams    Team[]
+  members  UserOrganization[]
+}
+
+model Team {
+  id             String   @id @default(cuid())
+  name           String
+  organizationId String
+  managerId      String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  organization Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  manager      User?             @relation("TeamManager", fields: [managerId], references: [id])
+  members      UserOrganization[]
+}
+
+model UserOrganization {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String
+  teamId         String?
+  joinedAt       DateTime @default(now())
+  
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  team         Team?        @relation(fields: [teamId], references: [id])
+  
+  @@unique([userId, organizationId])
+}
+
+enum Role {
+  EMPLOYEE
+  MANAGER
+  ADMIN
+}
+
+enum TestType {
+  PERSONALITY
+  COGNITIVE
+  ANXIETY
+  DEPRESSION
+  GENERAL
+}

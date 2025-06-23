@@ -1,0 +1,278 @@
+
+---- BUGFIXING REPORT ----
+
+
+---
+modificato file ./Dockerfile a righe 9-10
+BUG:
+	=> ERROR [app deps 3/3] RUN npm ci
+FIX:
+	# 👇 160626-AGGIUNTA QUESTA RIGA PER COPIARE PRISMA, NECESSARIO ALL'INSTALLAZIONE
+	COPY prisma ./prisma
+
+---
+modificato file ./scripts/check-database.ts a riga 98
+BUG:
+	53.94 Type error: Argument of type 'string | null' is not assignable to parameter of type 'string'.
+	53.94   Type 'null' is not assignable to type 'string'.
+	53.94 >  98 |         const metadata = JSON.parse(firstReport.metadata);
+	53.94       |                                     ^
+FIX: 
+	53.94 >  98 |         const metadata = firstReport.metadata ? JSON.parse(firstReport.metadata) : {};
+	
+	
+---
+modificato file ./scripts/verify-supabase.ts a riga 19
+BUG:
+	54.33 // 1. Test di scrittura
+    54.33	console.log('1. Test di scrittura nel database...');
+    54.33		const testData = {
+    54.33 		email: `test-${Date.now()}@example.com`,
+    54.33  		name: 'Test User',
+    54.33 		password: 'test123',
+    54.33  		role: 'USER' as const
+    };
+	
+	54.33     Type '{ email: string; name: string; password: string; role: "USER"; }' is not assignable to type 'UserCreateInput'.
+	54.33       Types of property 'role' are incompatible.
+	54.33         Type '"USER"' is not assignable to type 'Role | undefined'.
+	54.33 > 19 |       data: testData
+	54.33      |       ^
+FIX: 
+	54.33 // 1. Test di scrittura
+    54.33	console.log('1. Test di scrittura nel database...');
+    54.33		const testData = {
+    54.33 		email: `test-${Date.now()}@example.com`,
+    54.33  		name: 'Test User',
+    54.33 		password: 'test123',
+    54.33  		role: Role.EMPLOYEE
+    };
+	
+	
+---
+modificato file ./src/app/api/admin/organizations/[id]/members/[memberId]/route.ts a riga 19
+BUG:
+	54.30   18 |     // Verifica che il membro appartenga all'organizzazione
+	54.30 > 19 |     const membership = await prisma.organizationMembership.findFirst({
+	54.30      |                                     ^
+FIX: 
+	54.30   18 |     // Verifica che il membro appartenga all'organizzazione
+	54.30 > 19 |     const membership = await prisma.userOrganization.findFirst({                                  ^
+	
+	
+---
+modificato file ./src/app/api/admin/teams/[id]/members/[memberId]/route.ts a riga 19
+BUG:
+	51.30   18 |     // Verifica che il membro appartenga al team
+	51.30 > 19 |     const membership = await prisma.organizationMembership.findFirst({
+	51.30      |                                     ^
+FIX: 
+	51.30   18 |     // Verifica che il membro appartenga al team
+	51.30 > 19 |     const membership = await prisma.userOrganization.findFirst({ 
+	
+	
+---
+modificato file ./src/app/api/admin/teams/[id]/members/route a riga 31
+BUG:
+	54.49   30 |     // Verifica che il membro esista e appartenga alla stessa organizzazione
+	54.49 > 31 |     const membership = await prisma.organizationMembership.findUnique({
+FIX: 
+	54.49   30 |     // Verifica che il membro esista e appartenga alla stessa organizzazione
+	54.49 > 31 |     const membership = await prisma.userOrganization.findUnique({
+	
+	
+---
+modificato file ./src/app/api/admin/teams/[id]/route.ts a riga 68
+BUG:
+	54.03 > 68 |     await prisma.organizationMembership.updateMany({
+	54.03      |                  ^
+FIX: 
+	54.03 > 68 |     await prisma.userOrganization.updateMany({
+	
+	
+---
+modificato file ./src/app/api/ai/test/route.ts a riga 39
+BUG:
+	56.32 Type error: 'error' is of type 'unknown'.
+	56.32   37 |     return NextResponse.json({
+	56.32   38 |       success: false,
+	56.32 > 39 |       error: error.message,
+	56.32      |              ^
+FIX: 
+	56.32 > 39 |       error: error instanceof Error ? error.message : String(error),
+	
+	
+	
+---
+modificato file ./src/app/api/auth/clear-session/route.ts a riga 6
+BUG:
+	62.10 Type error: Property 'delete' does not exist on type 'Promise<ReadonlyRequestCookies>'.
+	62.10   6  |   const cookieStore = cookies();
+	...
+	62.10   18 |   authCookies.forEach(cookieName => {
+	62.10 > 19 |     cookieStore.delete(cookieName);
+	62.10      |                 ^
+FIX: 
+	62.10   6  |   const cookieStore = await cookies(); // aggiunto await
+	
+	
+	
+	
+---
+segnalato al file ./src/app/api/manager/tests/route.ts a riga 60
+BUG:
+	57.96 Type error: Object literal may only specify known properties, and 'createdAt' does not exist in type 'TestResultSelect<DefaultArgs>'.
+	57.96   58 |         },
+	57.96   59 |         completedAt: true,
+	57.96 > 60 |         createdAt: true
+	57.96      |         ^
+	
+	86	model TestResult {
+	87	  id          String   @id @default(cuid())
+	88	  userId      String
+	89	  testId      String
+	90	  answers     String // JSON stored as string in SQLite
+	91	  metadata    String? // JSON stored as string in SQLite
+	92	  completedAt DateTime @default(now())
+	93	  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+	94	  test        Test     @relation(fields: [testId], references: [id], onDelete: Cascade)
+	95	  reports     Report[]
+	96	}
+FIX: 
+	modificato file ./prisma/schema.prisma a riga 93
+	eseguito im seguito il comando "npx prisma migrate dev --name add-created-at-to-testresult" per sincronizzare il database con lo schema
+	questo comando richiede node.js installato
+	
+	86	model TestResult {
+	87	  id          String   @id @default(cuid())
+	88	  userId      String
+	89	  testId      String
+	90	  answers     String // JSON stored as string in SQLite
+	91	  metadata    String? // JSON stored as string in SQLite
+	92	  completedAt DateTime @default(now())
+	93	  createdAt   DateTime @default(now()) // <--- aggiunta questa riga
+	94	  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+	95	  test        Test     @relation(fields: [testId], references: [id], onDelete: Cascade)
+	96	  reports     Report[]
+	97	}
+
+	
+	
+---
+segnalato al file ./src/app/lib/auth.ts a riga 72
+BUG:
+	65.01   Type 'Promise<{}>' is not assignable to type 'Awaitable<JWT>'.
+	65.01     Type 'Promise<{}>' is missing the following properties from type 'JWT': id, role
+	65.01
+	65.01   70 |   },
+	65.01   71 |   callbacks: {
+	65.01 > 72 |     async jwt({ token, user, trigger, session }) {
+	65.01      |           ^
+	...
+	65.10   100|   return {};
+FIX: 
+	modificata apportata a riga 100
+	65.10   100|   return token;
+	
+	
+	
+---
+segnalato al file ./src/app/lib/pdf/pid5-generator.ts a riga 127
+BUG:
+	64.93 Type error: Type 'number[]' is not assignable to type 'Color | undefined'.
+	64.93   Type 'number[]' is not assignable to type '[number, number, number]'.
+	64.93     Target requires 3 element(s) but source may have fewer.
+	
+	24	  // Configurazione font e colori
+	25	  const primaryColor = [106, 76, 147]; // #6a4c93
+	26	  const textColor = [51, 51, 51]; // #333333
+	27	  const lightGray = [245, 245, 245]; // #f5f5f5
+	  ...
+	64.93
+	64.93   125 |     theme: 'grid',
+	64.93   126 |     headStyles: {
+	64.93 > 127 |       fillColor: lightGray,
+	64.93       |       ^
+FIX: 
+	modificata apportata alle righe 25, 26 e 27
+	24	  // Configurazione font e colori
+    25	  const primaryColor: [number, number, number] = [106, 76, 147]; // #6a4c93
+    26	  const textColor: [number, number, number] = [51, 51, 51]; // #333333
+    27	  const lightGray: [number, number, number] = [245, 245, 245]; // #f5f5f5
+	
+	
+	
+---
+segnalato al file ./src/app/lib/sas-pdf-generator.ts a riga 90
+BUG:
+	64.22 Type error: Type 'number[]' is not assignable to type 'Color | undefined'.
+	64.22   Type 'number[]' is not assignable to type '[number, number, number]'.
+	64.22     Target requires 3 element(s) but source may have fewer.
+	
+	16	  // Configurazione font e colori
+	17	  const primaryColor = [106, 76, 147]; // #6a4c93
+	18	  const textColor = [51, 51, 51]; // #333333
+	19	  const lightGray = [245, 245, 245]; // #f5f5f5
+	  ...
+	64.22
+	64.22   88 |     theme: 'grid',
+	64.22   89 |     headStyles: {
+	64.22 > 90 |       fillColor: lightGray,
+	64.22      |       ^
+FIX: 
+	modificata apportata alle righe 17, 18 e 19
+	16	  // Configurazione font e colori
+    17	  const primaryColor: [number, number, number] = [106, 76, 147]; // #6a4c93
+    18	  const textColor: [number, number, number] = [51, 51, 51]; // #333333
+    19	  const lightGray: [number, number, number] = [245, 245, 245]; // #f5f5f5
+	
+	
+---
+segnalato al file ./src/app/tests/[id]/take/page.tsx a riga 194
+BUG:
+	72.38 Type error: Parameter 'e' implicitly has an 'any' type.
+	72.38
+	72.38   192 |   useEffect(() => {
+	72.38   193 |     // Rimuovi il listener di localStorage quando si carica la pagina
+	72.38 > 194 |     const handleStorage = (e) => {
+	72.38       |                            ^
+FIX: 
+	modificata apportata a riga 194
+	72.38   192 |   useEffect(() => {
+	72.38   193 |     // Rimuovi il listener di localStorage quando si carica la pagina
+	72.38 > 194 |     const handleStorage = (e: StorageEvent) => {
+	
+	
+---
+segnalato al file ./src/app/tests/[id]/take/page.tsx a riga 214
+BUG:
+	62.02 Type error: Property 'testSaveThrottled' does not exist on type 'Window & typeof globalThis'.
+	62.02
+	62.02   212 |
+	62.02   213 |     // Imposta un debounce sui salvataggi di localStorage
+	62.02 > 214 |     window.testSaveThrottled = false;
+	62.02       |            ^
+FIX: 
+	modificata apportata da riga 10 a riga 14 aggiungendo istruzione declare global
+	10	declare global {
+	11	interface Window {
+    12	testSaveThrottled?: boolean;
+	13	  }
+	14	}
+	
+		
+---
+modificato file ./src/app/tests/sas/results/page.tsx a riga 260
+BUG:
+	57.06 Type error: Type '{ children: string; width: string; }' is not assignable to type 'DetailedHTMLProps<ThHTMLAttributes<HTMLTableHeaderCellElement>, HTMLTableHeaderCellElement>'.
+	57.06   Property 'width' does not exist on type 'DetailedHTMLProps<ThHTMLAttributes<HTMLTableHeaderCellElement>, HTMLTableHeaderCellElement>'. 
+	57.06
+	57.06   258 |                             <th>Fattore</th>
+	57.06   259 |                             <th>Punteggio</th>
+	57.06 > 260 |                             <th width="40%">Barra di Progresso</th>
+	57.06       |                                 ^
+FIX: 
+	57.06   258 |                             <th>Fattore</th>
+	57.06   259 |                             <th>Punteggio</th>
+	57.06 > 260 |                             <th style={{ width: "40%" }}>Barra di Progresso</th>
+	57.06       |       

@@ -1,0 +1,311 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+
+/* CSS Custom Properties */
+:root {
+  --max-width: 1200px;
+  --border-radius: 0.75rem;
+  
+  /* Bootstrap color overrides */
+  --bs-primary: #2c3e50;
+  --bs-primary-rgb: 44, 62, 80;
+  --bs-secondary: #6c757d;
+  --bs-success: #28a745;
+  --bs-info: #17a2b8;
+  --bs-warning: #ffc107;
+  --bs-danger: #dc3545;
+  --bs-light: #f8f9fa;
+  --bs-dark: #343a40;
+  
+  /* Custom colors - rimuovo i duplicati e uso solo le variabili Bootstrap */
+  --accent-color: #3498db;
+  --background-color: #f8f9fc;
+}
+
+/* Base styles */
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html, body {
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  background-color: var(--background-color);
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-poppins), system-ui, sans-serif;
+  font-weight: 600;
+}
+
+/* Button styles */
+.btn {
+  font-weight: 500;
+  padding: 0.5rem 1.5rem;
+  border-radius: 0.375rem;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+}
+
+.btn-primary:hover {
+  background-color: #1a252f;
+  border-color: #1a252f;
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+  color: white;
+}
+
+/* Card styles */
+.card {
+  border-radius: 0.75rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+/* Classe unificata per hover delle card */
+.card-hover,
+.hover-shadow,
+.dashboard-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-hover:hover,
+.hover-shadow:hover,
+.dashboard-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Navigation styles */
+.nav-link {
+  font-weight: 500;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.navbar-dark .navbar-nav .nav-link:hover {
+  color: rgba(255, 255, 255, 1);
+}
+
+/* Shadow utilities */
+.shadow-sm {
+  box-shadow: 0 0.125rem 0.375rem rgba(0, 0, 0, 0.07) !important;
+}
+
+/* Rimuovo shadow-hover duplicato - uso solo hover-shadow */
+
+/* Hover effects */
+.hover-white:hover {
+  color: white !important;
+  transition: color 0.3s ease;
+}
+
+/* Transition utilities */
+.transition {
+  transition: all 0.3s ease;
+}
+
+/* Animation for loading elements */
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-in;
+}
+
+/* Custom form styles */
+.form-control:focus {
+  border-color: var(--bs-primary);
+  box-shadow: 0 0 0 0.25rem rgba(44, 62, 80, 0.25);
+}
+
+/* Gradient backgrounds */
+.bg-gradient-primary {
+  background: linear-gradient(135deg, var(--bs-primary) 0%, #34495e 100%);
+}
+
+/* Custom badge */
+.badge-pill-outline {
+  border: 1px solid;
+  background-color: transparent;
+}
+
+/* Utilities */
+.text-truncate-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Responsive font sizes */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 1.8rem !important;
+  }
+  h2 {
+    font-size: 1.5rem !important;
+  }
+  .lead {
+    font-size: 1.1rem !important;
+  }
+}
+
+/* Stili per la modalità gestione test */
+.card.opacity-75 {
+  opacity: 0.75;
+  transition: opacity 0.3s ease;
+}
+
+.card.opacity-75:hover {
+  opacity: 1;
+}
+
+.form-check-input:disabled {
+  cursor: not-allowed;
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Animazione per il toggle switch */
+.form-check-input {
+  transition: background-color 0.3s ease;
+}
+
+/* Card header per la modalità gestione */
+.card-header.bg-light {
+  background-color: #f8f9fa !important;
+  border-bottom: 1px solid #dee2e6;
+}
+
+/* Hover effect per le card in modalità gestione */
+.card:has(.card-header) {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:has(.card-header):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Stili per il dropdown del menu utente */
+.navbar .dropdown-menu {
+  border: none;
+  border-radius: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.navbar .dropdown-item {
+  padding: 0.5rem 1rem;
+  transition: all 0.2s ease;
+}
+
+.navbar .dropdown-item:hover {
+  background-color: #f8f9fa;
+  padding-left: 1.25rem;
+}
+
+.navbar .dropdown-item i {
+  width: 20px;
+  text-align: center;
+}
+
+/* Animazione per il dropdown */
+.dropdown-menu {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: none;
+}
+
+.dropdown-menu.show {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* Stile per il toggle del dropdown */
+.dropdown-toggle::after {
+  transition: transform 0.2s ease;
+}
+
+.dropdown-toggle[aria-expanded="true"]::after {
+  transform: rotate(180deg);
+}
+
+/* Landing Page Styles */
+.landing-page {
+  margin-top: -76px; /* Offset navbar height */
+}
+
+.hero-section {
+  background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+}
+
+.min-vh-75 {
+  min-height: 75vh;
+}
+
+.feature-icon {
+  width: 60px;
+  height: 60px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Dashboard Styles */
+.dashboard-card {
+  border: 1px solid transparent;
+}
+
+.dashboard-card:hover {
+  border-color: var(--bs-primary);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .hero-section h1 {
+    font-size: 2rem;
+  }
+  
+  .landing-page {
+    margin-top: -56px; /* Mobile navbar height */
+  }
+}
+
+/* Utility classes */
+.min-vh-100 {
+  min-height: 100vh;
+}
+
+/* Footer styles */
+footer {
+  margin-top: auto;
+}
+
+/* Ensure proper spacing for authenticated pages */
+main.flex-grow-1 {
+  min-height: calc(100vh - 76px - 60px); /* viewport - navbar - footer */
+} 

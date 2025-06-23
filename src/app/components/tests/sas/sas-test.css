@@ -1,0 +1,154 @@
+/* Stili per i pulsanti di valutazione nella Parte I */
+.rating-button {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px !important;
+  font-size: 18px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Animazione di riempimento al click */
+.rating-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
+}
+
+.rating-button:active::before {
+  width: 100px;
+  height: 100px;
+}
+
+/* Hover effect */
+.rating-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Stato selezionato */
+.rating-button.selected {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Animazione pulse per il pulsante selezionato */
+@keyframes pulse-sas {
+  0% {
+    box-shadow: 0 0 0 0 rgba(106, 76, 147, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(106, 76, 147, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(106, 76, 147, 0);
+  }
+}
+
+.rating-button.btn-primary.selected {
+  animation: pulse-sas 1.5s infinite;
+}
+
+.rating-button.btn-secondary.selected {
+  animation: pulse-sas-secondary 1.5s infinite;
+}
+
+@keyframes pulse-sas-secondary {
+  0% {
+    box-shadow: 0 0 0 0 rgba(108, 117, 125, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(108, 117, 125, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(108, 117, 125, 0);
+  }
+}
+
+/* Transizione smooth per il cambio di colore */
+.rating-button.btn-outline-primary,
+.rating-button.btn-outline-secondary {
+  transition: all 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Container per i pulsanti con spacing uniforme */
+.rating-buttons-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+/* Label sotto i pulsanti */
+.rating-label {
+  font-size: 12px;
+  margin-top: 8px;
+  text-align: center;
+  color: #6c757d;
+  transition: color 0.3s ease;
+}
+
+.rating-button:hover + .rating-label {
+  color: #495057;
+}
+
+/* Animazione di fade-in per le nuove domande */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.question-card {
+  animation: fadeInUp 0.5s ease;
+}
+
+/* Progress bar animata */
+.progress-bar {
+  transition: width 0.5s ease;
+}
+
+/* Hover effect per le card nella Parte II */
+.selection-card {
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.selection-card:hover {
+  transform: translateX(5px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Animazione check per la selezione */
+@keyframes checkmark {
+  0% {
+    transform: scale(0) rotate(45deg);
+  }
+  50% {
+    transform: scale(1.2) rotate(45deg);
+  }
+  100% {
+    transform: scale(1) rotate(45deg);
+  }
+}
+
+.selection-check {
+  animation: checkmark 0.3s ease;
+} 
